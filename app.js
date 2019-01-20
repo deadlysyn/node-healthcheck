@@ -1,54 +1,45 @@
 const express = require('express');
-const m = require('./middleware');
 
+const app = express();
 const ip = process.env.IP || '0.0.0.0';
 const port = parseInt(process.env.PORT, 10) || 3000;
 
-const app = express();
+// hold test results
+global.testResults = { status: 200 };
 
-app.use((req, res, next) => {
-  if (!req.app.locals.testResults) {
-    req.app.locals.testResults = {};
-  }
-
-  if (!req.app.locals.statusCode) {
-    req.app.locals.statusCode = 200;
-  }
-
-  next();
-});
-
-// simulate tests which take >1s
-const databaseTest = (req, res, next) =>
+// simulate tests taking >1s
+const databaseTest = () =>
   new Promise(resolve => {
     setTimeout(() => {
-      resolve(() => {
-        req.app.locals.testResults.database = {
-          message: 'OK',
-          timestamp: Date.now().toJSON(),
-        };
-        req.app.locals.statusCode = 200;
-      });
-    }, 2000);
-  });
-
-const networkTest = (req, res, next) =>
-  new Promise(resolve => {
-    setTimeout(() => {
-      resolve(() => {
-        req.app.locals.testResults.network = {
-          message: 'OK',
-          timestamp: Date.now().toJSON(),
-        };
-        req.app.locals.statusCode = 200;
+      console.log('db test running');
+      resolve({
+        message: 'OK',
+        timestamp: Date.now(),
       });
     }, 3000);
   });
 
-const runTests = async (req, res, next) => {
-  const db = await databaseTest(req);
-  const net = await networkTest(req);
-  next();
+const networkTest = () =>
+  new Promise(resolve => {
+    setTimeout(() => {
+      console.log('network test running');
+      resolve({
+        message: 'FAIL',
+        timestamp: Date.now(),
+      });
+    }, 2000);
+  });
+
+const testRunner = async (req, next) => {
+  testResults.database = await databaseTest();
+  if (testResults.database.message !== 'OK') {
+    testResults.status = 500;
+  }
+  testResults.network = await networkTest();
+  if (testResults.network.message !== 'OK') {
+    testResults.status = 500;
+  }
+  // etc...
 };
 
 // routes
@@ -56,9 +47,10 @@ app.get('/', (req, res, next) => {
   res.json({ message: 'Hello World!' });
 });
 
-app.get('/healthcheck', m.healthcheck, (req, res, next) => {
-  // timestamp: new Date().toJSON(),
-  res.status(req.app.locals.statusCode).json({ results: req.app.locals.testResults });
+app.get('/healthcheck', (req, res, next) => {
+  // not middleware so we don't wait for next()
+  testRunner();
+  res.status(testResults.status).json(testResults);
 });
 
 app.all('*', (req, res, next) => {
