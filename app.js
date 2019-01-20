@@ -6,13 +6,7 @@ const port = parseInt(process.env.PORT, 10) || 3000;
 
 const app = express();
 
-// const fs = require('fs');
-// const path = require('path');
-// const configFile = path.join(__dirname, process.env.CONF);
-
 app.use((req, res, next) => {
-  express.static('public');
-
   if (!req.app.locals.testResults) {
     req.app.locals.testResults = {};
   }
@@ -23,6 +17,39 @@ app.use((req, res, next) => {
 
   next();
 });
+
+// simulate tests which take >1s
+const databaseTest = (req, res, next) =>
+  new Promise(resolve => {
+    setTimeout(() => {
+      resolve(() => {
+        req.app.locals.testResults.database = {
+          message: 'OK',
+          timestamp: Date.now().toJSON(),
+        };
+        req.app.locals.statusCode = 200;
+      });
+    }, 2000);
+  });
+
+const networkTest = (req, res, next) =>
+  new Promise(resolve => {
+    setTimeout(() => {
+      resolve(() => {
+        req.app.locals.testResults.network = {
+          message: 'OK',
+          timestamp: Date.now().toJSON(),
+        };
+        req.app.locals.statusCode = 200;
+      });
+    }, 3000);
+  });
+
+const runTests = async (req, res, next) => {
+  const db = await databaseTest(req);
+  const net = await networkTest(req);
+  next();
+};
 
 // routes
 app.get('/', (req, res, next) => {
@@ -38,6 +65,6 @@ app.all('*', (req, res, next) => {
   res.status(404).json({ message: 'Page not found.' });
 });
 
-app.listen(port, ip, _ => {
+app.listen(port, ip, () => {
   console.log(`listening on ${ip}:${port}`);
 });
