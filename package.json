@@ -17,9 +17,6 @@
   },
   "homepage": "https://github.com/deadlysyn/node-healthcheck#readme",
   "dependencies": {
-    "cfenv": "^1.1.0",
-    "express": "^4.16.4",
-    "mysql": "^2.16.0",
-    "redis": "^2.8.0"
+    "express": "^4.16.4"
   }
 }
