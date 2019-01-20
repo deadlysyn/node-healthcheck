@@ -60,7 +60,9 @@ Have fun!
 
 # Test Drive
 
-If you have Docker running on your machine, you can simply clone this project
+If you have
+[Docker](https://www.docker.com)
+running on your machine, you can simply clone this project
 then run `make build; make run` to get Express listening on
 `http://localhost:3000`.  The root path is uninteresting, but if you hit
 `/healthcheck` cool things will happen (depending how geeky you are)...
