@@ -58,6 +58,79 @@ like this... please share ideas for improvement.
 
 Have fun!
 
+# Test Drive
+
+If you have Docker running on your machine, you can simply clone this project
+then run `make build; make run` to get Express listening on
+`http://localhost:3000`.  The root path is uninteresting, but if you hit
+`/healthcheck` cool things will happen...
+
+The endpoint will respond immediately with the default response code (200).
+This keeps the health check process happy.  In parallel, `testRunner` gets
+kicked off.  It wraps a couple mock tests purposefully slowed down by
+`setTimeout`.  If you watch stdout, you'll see "db test running" after a
+few seconds, and "network test running" a few seconds later.  Refreshing
+the endpoint will show the test results.  You can set `message` to something
+other than "OK" to simulate failure.  Failure in any of the test results
+in a 500 status code.
+
+```shell
+❯ http localhost:3000/healthcheck
+HTTP/1.1 200 OK
+Connection: keep-alive
+Content-Length: 14
+Content-Type: application/json; charset=utf-8
+Date: Sun, 20 Jan 2019 18:09:30 GMT
+ETag: W/"e-QlsUp1vTYvBgYHrHCBYe2n/q268"
+X-Powered-By: Express
+
+{
+    "status": 200
+}
+
+❯ http localhost:3000/healthcheck
+HTTP/1.1 200 OK
+Connection: keep-alive
+Content-Length: 121
+Content-Type: application/json; charset=utf-8
+Date: Sun, 20 Jan 2019 18:06:56 GMT
+ETag: W/"79-topudR8vULOkkpcpIVCdvk+S1nQ"
+X-Powered-By: Express
+
+{
+    "database": {
+        "message": "OK",
+        "timestamp": 1548007610802
+    },
+    "network": {
+        "message": "OK",
+        "timestamp": 1548007612803
+    },
+    "status": 200
+}
+
+❯ http localhost:3000/healthcheck
+HTTP/1.1 500 Internal Server Error
+Connection: keep-alive
+Content-Length: 125
+Content-Type: application/json; charset=utf-8
+Date: Sun, 20 Jan 2019 18:09:43 GMT
+ETag: W/"7d-NbOObgl/2uT9jLi9gSpqy8qDyWE"
+X-Powered-By: Express
+
+{
+    "database": {
+        "message": "OK",
+        "timestamp": "1548007773994"
+    },
+    "network": {
+        "message": "FAIL",
+        "timestamp": 1548007775999
+    },
+    "status": 500
+}
+```
+
 # References
 
 - https://docs.cloudfoundry.org/concepts/architecture
