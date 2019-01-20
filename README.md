@@ -63,15 +63,15 @@ Have fun!
 If you have Docker running on your machine, you can simply clone this project
 then run `make build; make run` to get Express listening on
 `http://localhost:3000`.  The root path is uninteresting, but if you hit
-`/healthcheck` cool things will happen...
+`/healthcheck` cool things will happen (depending how geeky you are)...
 
 The endpoint will respond immediately with the default response code (200).
 This keeps the health check process happy.  In parallel, `testRunner` gets
 kicked off.  It wraps a couple mock tests purposefully slowed down by
 `setTimeout`.  If you watch stdout, you'll see "db test running" after a
-few seconds, and "network test running" a few seconds later.  Refreshing
+few seconds, and "network test running" a couple seconds later.  Refreshing
 the endpoint will show the test results.  You can set `message` to something
-other than "OK" to simulate failure.  Failure in any of the test results
+other than "OK" to simulate failure.  Failure of any test results
 in a 500 status code.
 
 ```shell
