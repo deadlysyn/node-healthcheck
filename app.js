@@ -8,6 +8,7 @@ const port = parseInt(process.env.PORT, 10) || 3000;
 global.testResults = { status: 200 };
 
 // simulate tests taking >1s
+// change message to non-OK string to simulate failure
 const databaseTest = () =>
   new Promise(resolve => {
     setTimeout(() => {
@@ -24,7 +25,7 @@ const networkTest = () =>
     setTimeout(() => {
       console.log('network test running');
       resolve({
-        message: 'FAIL',
+        message: 'OK',
         timestamp: Date.now(),
       });
     }, 2000);
