@@ -3,28 +3,22 @@
 __Standard Disclaimer: I am not a developer, I don't even play one on YouTube.
 I just like imagining I could be one when I grow up.__
 
-This is a simple
-[Node](https://nodejs.org)
-app utilizing
+This is a simple [Node](https://nodejs.org) app utilizing
 [promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-and
-[async/await](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)
-to simulate a healthcheck pattern designed to work with
-[Cloud Foundry](https://www.cloudfoundry.org).
+and [async/await](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)
+to simulate a health check pattern designed to work with [Cloud Foundry](https://www.cloudfoundry.org).
 First a small (I promise) bit of history for context...
 
-Cloud Foundry (CF) has a concept of a "health checks".  These can take many forms,
+Cloud Foundry (CF) has a concept of "health checks".  These can take many forms,
 but the preferred approach is HTTP.  Apps can expose a `/healthcheck` endpoint
-which the
-[Cloud Controller](https://docs.cloudfoundry.org/concepts/architecture/cloud-controller.html)
-polls.  If an app becomes unhealthy (indicated by
-HTTP status code), restart/repair is attempted.
+which the [Cloud Controller](https://docs.cloudfoundry.org/concepts/architecture/cloud-controller.html)
+polls.  If an app becomes unhealthy (indicated by HTTP status code),
+restart/repair is attempted.
 
 There is a "health check timeout" which I like to think of as the "startup
 timeout".  During initial startup, the health check process will wait this
 long (polling every couple seconds) for the app to become healthy.  This value
-is configurable (60-600 seconds in
-[Pivotal Cloud Foundry](https://pivotal.io/platform)),
+is configurable (60-600 seconds in [Pivotal Cloud Foundry](https://pivotal.io/platform)),
 supporting apps which have more intensive setup tasks.
 
 There is also an "invocation timeout" which controls how long the health
@@ -33,8 +27,7 @@ has completed and app provided first healthy response).  Historically, this
 was hard coded to one second.  This meant apps that needed to do intensive
 health checks would often timeout and be judged unhealthy (restart!).
 
-[A patch was provided which makes this configurable](https://github.com/cloudfoundry/cloud_controller_ng/issues/1055)
-, but when I first heard about this I had flashbacks to a prior life...
+[A patch was provided which makes this configurable](https://github.com/cloudfoundry/cloud_controller_ng/issues/1055), but when I first heard about this I had flashbacks to a prior life...
 The general problem is nothing CF specific. I recall working around similar
 issues when Nagios and Cacti were cutting edge (poller timeouts).  This is not
 a pattern I invented, colleagues much smarter than I pointed out the solution
@@ -60,12 +53,10 @@ Have fun!
 
 # Test Drive
 
-If you have
-[Docker](https://www.docker.com)
-running on your machine, you can simply clone this project
-then run `make build; make run` to get Express listening on
-`http://localhost:3000`.  The root path is uninteresting, but if you hit
-`/healthcheck` cool things will happen (depending how geeky you are)...
+If you have [Docker](https://www.docker.com) running on your machine, you can
+simply clone this project then run `make build; make run` to get Express
+listening on `http://localhost:3000`.  The root path is uninteresting, but if
+you hit `/healthcheck` cool things will happen (depending how geeky you are)...
 
 The endpoint will respond immediately with the default response code (200).
 This keeps the health check process happy.  In parallel, `testRunner` gets
@@ -141,3 +132,7 @@ X-Powered-By: Express
 - https://dev.to/geoff/writing-asyncawait-middleware-in-express-6i0
 - https://medium.com/@tkssharma/writing-neat-asynchronous-node-js-code-with-promises-async-await-fa8d8b0bcd7c
 - https://httpie.org
+
+# Related
+
+- https://itnext.io/node-health-checks-b25a6c62d990
